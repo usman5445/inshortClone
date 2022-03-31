@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import clsx from "clsx";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 import Drawer from "@material-ui/core/Drawer";
@@ -19,6 +19,7 @@ import InboxIcon from "@material-ui/icons/MoveToInbox";
 import MailIcon from "@material-ui/icons/Mail";
 import Card from "./card";
 import NewsCard from "./card";
+import { fetchNews, GetData } from "../context";
 
 const drawerWidth = 240;
 
@@ -87,7 +88,10 @@ export default function Home() {
   const classes = useStyles();
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
-
+  const data = GetData();
+  useEffect(() => {
+    fetchNews("", data.dispatch);
+  }, []);
   const handleDrawerOpen = () => {
     setOpen(true);
   };
@@ -120,7 +124,7 @@ export default function Home() {
             variant="h6"
             noWrap
             edge="center"
-            style={{ marginLeft: "45%", fontWeight: "bold" }}
+            style={{ marginLeft: "45vw", fontWeight: "bold" }}
             className={classes.container}
             color="textPrimary"
           >
@@ -154,21 +158,19 @@ export default function Home() {
         <Divider />
         <List>
           {[
-            "India",
             "Business",
             "Sports",
-            "World",
-            "Politics",
             "Technology",
-            "Startup",
             "Entertainment",
-            "Miscellaneous",
-            "Hatke",
+            "General",
+            "Helth",
             "Science",
-            "Automobile",
           ].map((text, index) => (
             <ListItem button key={text}>
-              <ListItemText primary={text} />
+              <ListItemText
+                primary={text}
+                onClick={() => fetchNews(text.toLowerCase(), data.dispatch)}
+              />
             </ListItem>
           ))}
         </List>
@@ -179,8 +181,27 @@ export default function Home() {
         })}
       >
         <div className={classes.drawerHeader} />
-        <NewsCard />
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+          }}
+        >
+          {data.state.map((item) => (
+            <NewsCard
+              imgurl={item.urlToImage}
+              title={item.title}
+              disc={item.description}
+              author={item.author}
+              publishedAt={item.publishedAt}
+              readmurl={item.url}
+              source={item.source?.name}
+            />
+          ))}
+        </div>
       </main>
+      {console.log(data.state)}
     </div>
   );
 }
